@@ -8,7 +8,7 @@ moment.loadPersian({ dialect: 'persian-modern', usePersianDigits: false });
 
 const token = "7972229213:AAFi1xooCGC8L5sOMvi83zXDaS5ZD6aVk_U";
 if (!token) {
-  console.error('❌ لطفا در فایل .env متغیر BOT_TOKEN را تنظیم کنید.');
+  console.error('❌ Please set BOT_TOKEN in your environment (.env) file.');
   process.exit(1);
 }
 
@@ -26,7 +26,7 @@ const MENU = {
   Sunday:    'قیمه',
   Monday:    'شینسل مرغ',
   Tuesday:   'الویه',
-  Wednesday: 'کباب تابه ای',
+  Wednesday: 'کباب تابه‌ای',
   Thursday:  '----',
   Friday:    '----'
 };
@@ -56,13 +56,6 @@ function getTargetDay() {
     key:     target.locale('en').format('dddd'),
     display: target.format('dddd')
   };
-}
-
-function getFormattedDateTime() {
-  const now  = moment();
-  const date = now.format('jYYYY/jMM/jDD');
-  const time = now.format('HH:mm:ss');
-  return `تاریخ: ${date}    ساعت: ${time}`;
 }
 
 function broadcast(text) {
@@ -102,17 +95,13 @@ function listReservations() {
 
 bot.onText(/\/start/, msg => {
   const chatId = msg.chat.id;
-  const helpText = `👋 خوش آمدید!
+  const helpText = `👋 سلام دوست خنک‌دوست!
 
-شما می‌توانید:
-• /subscribe — عضویت پیام‌های کولر
-• /unsubscribe — لغو اشتراک
-• بخش کولر: هر ساعت ۱۵ دقیقه اول روشن، ۱۵ دقیقه بعد خاموش (10-19)
-• /menu — منوی فردا و رزرو
-• /myreserve — وضعیت رزرو فردا
-• /reservations — لیست رزروهای فردا
-• /reserved — نمایش کلی رزروها
-• /help — راهنما`;
+اینجا ربات کولر و غذامون هست:
+🍃 هر روز بین ۱۰ تا ۱۹، هر ربع خاموش/روشن کولر  
+🍽 منوی خوشمزه‌ی فردا و امکان رزرو  
+
+برای شروع یک دستور انتخاب کن:`;
   bot.sendMessage(chatId, helpText, {
     reply_markup: {
       keyboard: [
@@ -130,15 +119,15 @@ bot.onText(/\/help/, msg => {
   const chatId = msg.chat.id;
   const text = `📖 *راهنمای ربات*:
 
-*بخش کولر* (فعال: 10 تا 19 هر ساعت)
-• /subscribe — عضویت
-• /unsubscribe — لغو اشتراک
+❄️ *بخش کولر* (۱۰ صبح تا ۷ عصر)
+• /subscribe — عضویت در هشدارهای کولر  
+• /unsubscribe — لغو اشتراک  
 
-*بخش غذا*:
-• /menu — منوی فردا و رزرو
-• /myreserve — وضعیت رزرو فردا
-• /reservations — لیست رزروهای فردا
-• /reserved — نمایش کلی رزروها`;
+🍽 *بخش غذا*  
+• /menu — دیدن منوی فردا + دکمه‌های رزرو  
+• /myreserve — وضعیت رزرو شما  
+• /reservations — لیست اسامی  
+• /reserved — آمار رزروها`;
   bot.sendMessage(chatId, text, { parse_mode: 'Markdown' });
 });
 
@@ -147,9 +136,9 @@ bot.onText(/\/subscribe/, msg => {
   if (!subscribers.includes(chatId)) {
     subscribers.push(chatId);
     saveData();
-    bot.sendMessage(chatId, '✅ شما مشترک دریافت پیغام‌های کولر شدید.');
+    bot.sendMessage(chatId, '✅ تبریک! حالا عضو گروه کولرهای خنک هستی 🌬️');
   } else {
-    bot.sendMessage(chatId, '⚠️ شما قبلاً مشترک شده‌اید.');
+    bot.sendMessage(chatId, '⚠️ تو همین الانم تو لیست کولرهای خنک هستی 😉');
   }
 });
 
@@ -159,22 +148,24 @@ bot.onText(/\/unsubscribe/, msg => {
   if (idx !== -1) {
     subscribers.splice(idx, 1);
     saveData();
-    bot.sendMessage(chatId, '🛑 اشتراک شما لغو شد.');
+    bot.sendMessage(chatId, '🛑 اشتراک کولرت خاموش شد! فردا بدون ما لذت ببر 😢');
   } else {
-    bot.sendMessage(chatId, '⚠️ شما در لیست مشترکین نیستید.');
+    bot.sendMessage(chatId, '⚠️ تو اصلاً عضو لیست نبودی که بخوای لغو کنی 😉');
   }
 });
 
 bot.onText(/\/menu/, msg => {
   const chatId = msg.chat.id;
   const { key, display } = getTargetDay();
-  const meal = MENU[key] || 'منو ثبت نشده';
-  const text = `📅 منوی فردا (${display}): *${meal}*`;
+  const meal = MENU[key] || 'منو تعریف نشده';
+  const text = `📅 منوی فردا (${display}): *${meal}*
+
+آماده‌ای برای یک تجربه‌ی لذیذ؟`;
   bot.sendMessage(chatId, text, {
     parse_mode: 'Markdown',
     reply_markup: { inline_keyboard: [[
-      { text: 'رزرو', callback_data: 'do_reserve' },
-      { text: 'لغو رزرو', callback_data: 'do_cancel' }
+      { text: '🍽 رزرو کن!', callback_data: 'do_reserve' },
+      { text: '❌ انصراف از رزرو', callback_data: 'do_cancel' }
     ]] }
   });
 });
@@ -184,10 +175,10 @@ bot.onText(/\/myreserve/, msg => {
   const { key, display } = getTargetDay();
   const list = listReservations();
   const exists = list.some(u => u.id === chatId);
-  const meal = MENU[key] || '-----';
+  const meal = MENU[key] || '---';
   const text = exists
-    ? `✅ شما برای فردا (${display}) *${meal}* رزرو کرده‌اید.`
-    : `⚠️ شما برای فردا (${display}) رزروی ندارید.`;
+    ? `✅ تو برای فردا (${display})، *${meal}* رزرو کردی! جونت…`
+    : `⚠️ هنوز برای فردا (${display}) رزروی نداری. عجله کن!`;
   bot.sendMessage(chatId, text, { parse_mode: 'Markdown' });
 });
 
@@ -196,7 +187,7 @@ bot.onText(/\/reservations/, msg => {
   const { key, display } = getTargetDay();
   const list = listReservations();
   let text = `📋 لیست رزروهای فردا (${display}):\n`;
-  if (!list.length) text += 'هیچ رزروی ثبت نشده.';
+  if (!list.length) text += '— هیچ‌کس لذتشو از دست نداده هنوز!';
   else list.forEach((u, i) => { text += `${i+1}. ${u.name}\n`; });
   bot.sendMessage(chatId, text);
 });
@@ -204,10 +195,10 @@ bot.onText(/\/reservations/, msg => {
 bot.onText(/\/reserved/, msg => {
   const chatId = msg.chat.id;
   const { key, display } = getTargetDay();
-  const meal = MENU[key] || 'منو ثبت نشده';
+  const meal = MENU[key] || 'نامشخص';
   const list = listReservations();
-  let text = `📊 رزرو شده‌ها برای فردا (${display}) — ${meal}:\n`;
-  if (!list.length) text += 'هیچ کس رزرو نکرده.';
+  let text = `📊 آمار رزروها (${display}) — ${meal}:\n`;
+  if (!list.length) text += 'هیچ‌کس شانسشو امتحان نکرده!';
   else list.forEach((u, i) => { text += `${i+1}. ${u.name}\n`; });
   bot.sendMessage(chatId, text);
 });
@@ -217,23 +208,36 @@ bot.on('callback_query', query => {
   const name = query.from.first_name || query.from.username;
   if (query.data === 'do_reserve') {
     const res = reserveMeal(chatId, name);
-    const msg = res === true ? '✅ رزرو فردا ثبت شد.' :
-                res === 'exists' ? '⚠️ قبلاً رزرو کرده‌اید.' :
-                '❌ منو برای فردا موجود نیست.';
+    const msg = res === true
+      ? '🎉 رزرو فردا با موفقیت انجام شد! نوش جان :)'
+      : res === 'exists'
+        ? '😉 تو قبلاً رزرو کرده بودی!'
+        : '❌ امروز منو نیست که رزرو کنی.';
     bot.answerCallbackQuery(query.id, { text: msg });
   }
   if (query.data === 'do_cancel') {
     const ok = cancelReservation(chatId);
-    const msg = ok ? '🛑 رزرو فردا لغو شد.' : '⚠️ رزوی برای فردا ندارید.';
+    const msg = ok
+      ? '🛑 رزرو فردا لغو شد. شاید دفعه‌ی بعد ;)'
+      : '⚠️ رزروی برای لغو کردن نداری!';
     bot.answerCallbackQuery(query.id, { text: msg });
   }
 });
 
-function sendOn() { if (isCoolingTime()) broadcast(`🔵 لطفا کولر را روشن کنید.\n\n${getFormattedDateTime()}`); }
-function sendOff(){ if (isCoolingTime()) broadcast(`⚪️ لطفا کولر را خاموش کنید.\n\n${getFormattedDateTime()}`); }
+function sendOn() { 
+  if (isCoolingTime()) {
+    broadcast('🔵 وقتشه کولر رو روشن کنی و خنک شی گرممممممممممممه! ❄️');
+  }
+}
+function sendOff(){ 
+  if (isCoolingTime()) {
+    broadcast('⚪️ خب کولر رو خاموش کن تا جریمه نشدیم! 💸');
+  }
+}
+
 cron.schedule('0 10-18 * * *',  sendOn); 
 cron.schedule('15 10-18 * * *', sendOff);  
 cron.schedule('30 10-18 * * *', sendOn); 
 cron.schedule('45 10-18 * * *', sendOff); 
 
-console.log('✅ بات مدیریت کولر و رزرو غذا به‌روز شد.');
+console.log('✅ Cooling & Lunch Reservation Bot is up and running!');
