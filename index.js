@@ -235,9 +235,10 @@ function sendOff(){
   }
 }
 
-cron.schedule('0 10-18 * * *',  sendOn); 
-cron.schedule('15 10-18 * * *', sendOff);  
-cron.schedule('30 10-18 * * *', sendOn); 
-cron.schedule('45 10-18 * * *', sendOff); 
+cron.schedule('0 10-18 * * 6,0,1,2,3',  sendOn); 
+cron.schedule('15 10-18 * * 6,0,1,2,3', sendOff);  
+cron.schedule('30 10-18 * * 6,0,1,2,3', sendOn); 
+cron.schedule('45 10-18 * * 6,0,1,2,3', sendOff); 
+
 
 console.log('✅ Cooling & Lunch Reservation Bot is up and running!');
